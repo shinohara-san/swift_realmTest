@@ -1,0 +1,157 @@
+//
+//  TodoTableViewController.swift
+//  realmTest
+//
+//  Created by Yuki Shinohara on 2020/05/31.
+//  Copyright © 2020 Yuki Shinohara. All rights reserved.
+//
+
+import UIKit
+import RealmSwift
+
+class TodoTableViewController: UITableViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Uncomment the following line to preserve selection between presentations
+        // self.clearsSelectionOnViewWillAppear = false
+        
+        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+//        print(Realm.Configuration.defaultConfiguration.fileURL)
+    }
+    
+    // MARK: - Table view data source
+    @IBAction func didTapAddButton(_ sender: Any) {
+        
+        let ac = UIAlertController(title: "Todoを追加", message: nil, preferredStyle: .alert)
+        
+        ac.addTextField { (textField) in
+            textField.placeholder = "To do here"
+            
+        }
+        let add = UIAlertAction(title: "追加", style: .default) { (void) in
+            let textField = ac.textFields![0] as UITextField //ワンクッション
+            if let text = textField.text{
+                //                print(text)
+                let todo = Todo()
+                todo.text = text
+                let realm = try! Realm()
+                
+                try! realm.write {
+                    realm.add(todo)
+                }
+                self.tableView.reloadData()
+//                let todos = realm.objects(Todo.self)
+                //.filter("age < 2")
+//                print(todos.count)
+                
+            }
+        }
+        let cancel = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
+        ac.addAction(add)
+        ac.addAction(cancel)
+        present(ac, animated: true)
+        
+    }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        // #warning Incomplete implementation, return the number of sections
+        return 1
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        // #warning Incomplete implementation, return the number of rows
+        let realm = try! Realm()
+        
+        let todos = realm.objects(Todo.self)
+        //.filter("age < 2")
+        return todos.count
+    }
+    
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        
+        let realm = try! Realm()
+        let todos = realm.objects(Todo.self)
+        
+        let todo = todos[indexPath.row]
+        cell.textLabel?.text = todo.text
+        return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let realm = try! Realm()
+        let todos = realm.objects(Todo.self)
+        let todo = todos[indexPath.row]
+        
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "Detail") as? DetailViewController {
+//            vc.selectedImage = pictures[indexPath.row]
+            vc.todo = todo
+//            vc.Y = pictures.count
+            // 3: now push it onto the navigation controller
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    
+    
+
+     // Override to support conditional editing of the table view.
+     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+     // Return false if you do not want the specified item to be editable.
+     return true
+     }
+
+    
+    
+     // Override to support editing the table view.
+     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+     if editingStyle == .delete {
+        
+        let realm = try! Realm()
+        let todos = realm.objects(Todo.self)
+        let todo = todos[indexPath.row]
+        
+        try! realm.write({
+            realm.delete(todo)
+        })
+        
+     // Delete the row from the data source
+     tableView.deleteRows(at: [indexPath], with: .fade)
+     }
+//     else if editingStyle == .insert {
+     // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+//     }
+//     }
+    
+    
+    /*
+     // Override to support rearranging the table view.
+     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+     
+     }
+     */
+    
+    /*
+     // Override to support conditional rearranging of the table view.
+     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+     // Return false if you do not want the item to be re-orderable.
+     return true
+     }
+     */
+    
+    /*
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destination.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
+    }}
