@@ -38,6 +38,9 @@ class TodoTableViewController: UITableViewController {
                 //                print(text)
                 let todo = Todo()
                 todo.text = text
+                let date = Date()
+                let dateString = DateUtils.stringFromDate(date: date, format: "yyyy年MM月dd日 HH時mm分ss秒")
+                todo.setUpTime = dateString
                 let realm = try! Realm()
                 
                 try! realm.write {

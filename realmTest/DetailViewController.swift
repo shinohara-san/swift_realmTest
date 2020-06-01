@@ -8,6 +8,7 @@
 
 import UIKit
 
+
 class DetailViewController: UIViewController {
     
     @IBOutlet var imgView: UIImageView!
@@ -18,7 +19,8 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         title = todo.text
         imgView.image = UIImage(named: "person")
-        todoLabel.text = todo.text
+        todoLabel.text = todo.setUpTime
+//        print(todo.setUpTime)
     }
 
 }
